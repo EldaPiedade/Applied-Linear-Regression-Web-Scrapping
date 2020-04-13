@@ -3,6 +3,24 @@ The Data On this  Repository was gathered at https://texas.hometownlocator.com/t
 
 # Abstract
 
-The objective of this research is to implement Linear Regression, Deep Learning and Neural Network algorithms to predict the median home value for Houston zip codes.  By way of statistical analysis inferences will be made about the population, that is, all Houston zip codes. 
-Data is only usefully to the point that you can make inferences or predictions to solve a problem or gather information about a subject. For this project I was particularly interested to learn more about the Houston housing market. Therefore, data of 96 out of the total zip codes in Houston was gathered and utilized for descriptive and inferential statistics to understand the relationship between median home value and other variables available, such us diversity index and per capita income. For the next stage of the research data was modeled with linear regression and sequential neural network by Keras. With two models available I was able to evaluate which made better predictions by using the root mean square error metric.
-
+The objective of this research is to implement linear regression and
+neural network algorithms to predict the median home value for the
+houses in Houston zip codes. Data was gathered from 96 zip codes in
+Houston by utilizing python web scrapping resources to collect data
+from the Texas Hometown Locator website (owned by HTL, Inc.).With
+the dataset extracted and cleaned, exploratory data analysis and
+statistical analysis were performed to understand the relationship
+between the median home value and other variables, such as diversity
+index, per capita income, and average household size. Based on the
+analysis, data was modeled with linear regression and neural networks,
+with the goal of assessing which model yields the best results. Initial
+results from the linear regression model indicate that the diversity
+index and average household size are not significant predictors. On the
+other hand, the per capita income identifies as the best predictor.
+Additionally, although previous assumptions, the diversity index is
+only moderately negatively correlated with the median home value. In
+other words, the more diverse a zip code is, the slightly smaller is the
+median home value. Further, into this research, the population in focus
+will extend to other Texas cities, such as Austin. With more data, the
+relationship between variables and median home value can be better
+evaluated as well as the prediction capacity of each model.
