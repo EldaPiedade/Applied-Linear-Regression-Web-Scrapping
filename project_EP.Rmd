@@ -68,6 +68,28 @@ Predictors:
 
 \end{shaded}
 
+### Explained variables:
+
+\colorlet{shadecolor}{gray!10}
+
+\begin{shaded}
+1. The Diversity Index is a scale of 0 to 100 that represents the
+likelihood that two persons, chosen at random from the same area,
+belong to different races or ethnic groups. If an area's entire
+population belongs to one race and one ethnic group, then the area
+has zero diversity. An area's diversity index increases to 100 when
+the population is evenly divided into two or more race/ethnic
+groups.
+2. The Housing Affordability Index base is 100 and represents a
+balance point where a resident with a median household income
+can normally qualify to purchase a median price home. Values
+above 100 indicate increased affordability, while values below
+100 indicate decreased affordability.
+3. The outcome variable is the median home value ( median price
+home).
+
+\end{shaded}
+
 \pagebreak
 
 # Data Loading & Checking full Model Accuracy:
@@ -88,6 +110,7 @@ suppressMessages(library(car))
 suppressMessages(library(olsrr))
 suppressMessages(library(MPV))
 suppressMessages(library(gridExtra))
+suppressMessages(library(cvTools))
 
 reduce_dat <- read.csv("CSV/DATA/texas_Gazetteer_numeric.csv")
 reduce_dat <- reduce_dat[c("Median.Home.Value","Total.Population","Diversity.Index1","Median.Household.Income",
@@ -169,22 +192,34 @@ The criteria for our variable selection include:
 
 Based on the above criteria, the "best" candidate models are:
 
-1) Model 1:  y ~ x4
+1) Model 1: 
 
-2) Model 8:	 y ~ x3 + x7
+$log(y^{hat})= (1.136e+01) + (2.438e-05)x_4$
 
-3) Model 29: y ~ x3 + x6 + x7
+2) Model 8:	
 
-4) Model 64: y ~ x1 + x3 + x5 + x7
+$log(y^{hat})=(1.232e+01) +  (1.409e-05)x_3 -(7.258e-03 )x_7$
 
-5) Model 99: y ~ x1 + x3 + x5 + x6 + x7
+3) Model 29: 
 
-6) Model 120:y ~ x1 + x3 + x4 + x5 + x6 + x7
+$log(y^{hat})=(1.267e+01) +(1.301e-05)x_3   -(1.547e-01)x_6  -(6.197e-03)x_7$ 
 
-7) Model 127:y ~.
+4) Model 64: 
 
+$log(y^{hat})=(1.210e+01)-(1.258e-05)x_1+(1.382e-05)x_3+  (3.717e-05)x_5   -(6.015e-03 )x_7$
 
-Once we identified the "best"" candidate models, we compare its predicted residual error sum of squares (PRESS) statistic with other candidate models and selected the model with the smallest value. We also compare candidate models by performing a variance inflation factor (VIF) in order to quantify the severity of multicollinearity in the model.
+5) Model 99: 
+
+$log(y^{hat})=(1.221e+01 )-(1.036e-05)x_1+( 1.358e-05)x_3+ (3.176e-05)x_5   -(4.477e-02)x_6-(5.876e-03)x_7$
+
+6) Model 120: 
+
+$log(y^{hat})=(1.232e+01) -(1.084e-05)x_1+ (1.484e-05)x_3-(2.332e-06)x_4+(3.223e-05)x_5-(7.125e-02)x_6-(6.046e-03)x_7$
+
+7) Model 127:
+
+$log(y^{hat})= (1.234e+01) -(1.073e-05)x_1 -(2.442e-04)x_2 +(1.481e-05)x_3  -(2.328e-06)x_4+ (3.206e-05)x_5 -(7.059e-02)x_6-(6.052e-03 )x_7$
+
 
 \end{shaded}
 
@@ -201,9 +236,11 @@ plot(ols_step_all_possible(model))
 
 \begin{shaded}
 
-* The model with the lowest PRESS value is Model 64 however there is evidence of multicolliniearity.
+Once we identified the "best"" candidate models, we compare its predicted residual error sum of squares (PRESS) statistic with other candidate models and selected the model with the smallest value. We also compare candidate models by performing a variance inflation factor (VIF) in order to quantify the severity of multicollinearity in the model.
 
-* The model with the second lowest PRESS value is Model 29  and the same model doesnt show any evidence of multicolinearity in the variance inflation factor test of each regressor.
+*  The model with the lowest PRESS value is Model 64 however there is evidence of multicolliniearity.
+
+*  The model with the second lowest PRESS value is Model 29  and the same model doesnt show any evidence of multicolinearity in the variance inflation factor test of each regressor.
 
 \end{shaded}
 
@@ -251,3 +288,96 @@ grid.arrange(grobs = p@plots, ncol = 2, nrow = 1, labels = c("A", "B"),
              top= "Residual Plots for Model 29")
 grid.arrange(grobs = q@plots, ncol = 2, nrow = 1, top= "Residual Plots for Model 64")
 ```
+
+
+
+# Cross Validation:
+
+\colorlet{shadecolor}{gray!10}
+
+\begin{shaded}
+
+After splitting the data into 4 groups and repeating the fold cross-validation by 12, the best model is Model 64:
+
+$log(y^{hat}) = (1.210e+01) -(1.258e-05)Total.Population + (1.382e-05)Median.Household.Income + (3.717e-05)Total.Housing.Units -(6.015e-03)Housing.Affordability.Index$
+
+\end{shaded}
+\pagebreak
+
+```{r, echo=FALSE}
+m0 <- lm(y~x1+x3+x5+x7, data = reduce_dat)
+m1 <- lm(y~x3+x6+x7, data = reduce_dat)
+
+folds <- cvFolds(nrow(reduce_dat), K = 4, R =12) #type = "random", "consecutive", "interleaved"
+cvfit_0 <- cvLm(m0, cost = rtmspe,folds = folds)
+cvfit_1 <- cvLm(m1, cost = rtmspe,folds = folds)
+
+cvFits <- cvSelect(LS0 = cvfit_0, LS1 = cvfit_1)
+
+
+```
+#  Exploratory Data Analysis:
+
+\begin{shaded}
+
+In houston most zip codes have a diversity index close to 80. However we see that neigborhoods with low diversity index tend to be situated in the extremes. The less diverse areas either have a very large per capita income and median home value, or a very per capita income and median home value. Also we see a positive relashionship between both variables.
+\end{shaded}
+```{r, echo= FALSE, out.height= "30%"}
+#------------------------
+library(GGally)
+library(ggplot2)
+library(RCurl)
+library(bitops)
+
+
+
+ggplot(aes(x = Per.Capita.Income, y = Median.Home.Value), data = reduce_dat)+
+  geom_point(aes(colour = Diversity.Index1), position ='jitter',size = 0.5, shape=21)+
+  scale_color_continuous(low = 'blue', high = 'red')
+
+```
+\begin{shaded}
+Total population and median home value are not correlated. However we found some intesresting insights about how  Housing affordability index relates to both variables. The housing affordability index is large for houston areas with median home value bellow 250,000.00 dollars.
+\end{shaded}
+
+```{r, echo = FALSE, out.height= "30%"}
+ggplot(aes(x = Total.Population, y = Median.Home.Value), data = reduce_dat)+ 
+  geom_point(aes(colour = Housing.Affordability.Index2),position ='jitter',size = 0.5)+
+  scale_color_continuous(low = 'blue', high = 'sienna2')
+
+
+```
+\begin{shaded}
+
+Median Household income is positively correlated to Median home value. However, total housing units does not appear to have any linear relashion with median home value.
+
+\end{shaded}
+```{r, echo = FALSE, out.height= "30%"}
+
+ggplot(aes(x = Median.Household.Income,y =Median.Home.Value), data = reduce_dat)+
+  geom_point(aes(colour = Total.Housing.Units), shape = 21, size =1)
+```
+
+### Exploratory Analisys conclusion
+\begin{shaded}
+
+Although we are able to see how the variables used for our best models relate to median home value, we must call attention to the fact that our model predicts a transformed version of the median home value; Therefore, the relashionship may be diffent. Using correlation we can have some insight of how the predictors relate to the logged median home value.
+\end{shaded}
+
+```{r, echo = FALSE}
+paste("Logged Median value vs total population",round(cor(log(y),x1),3))
+paste("Logged Median value vs median household income",round(cor(log(y),x3),3)) # positive
+paste("Logged Median value vs total housing units",round(cor(log(y),x5),3))
+paste("Logged Median value vs housing affordability index",round(cor(log(y),x7),3))
+
+```
+\begin{shaded}
+It turns out that we have the same results of colleration. Median household income is positively correlated with logged median home value, and housing affordability index is negativelly correlatted with median home value. As for total population and total housing units, these are not correlated with median home value. The coeficients of our model agrees with this observation. That is, with all other variables held constant an increase of median household income by 1 dollars results in an increase of (1.382e-05) for logged median home value. In the same manner, an increase of housing affordability index by one unit, results in a decrease of (6.015e-03) for logged median home value.
+
+\end{shaded}
+
+
+\pagebreak
+
+# References
+

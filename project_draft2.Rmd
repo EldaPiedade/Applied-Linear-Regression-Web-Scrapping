@@ -49,6 +49,7 @@ suppressMessages(library(ggfortify))
 suppressMessages(library(car))
 suppressMessages(library(olsrr))
 suppressMessages(library(MPV))
+suppressMessages(library(cvTools))
 
 reduce_dat <- read.csv("CSV/DATA/texas_Gazetteer_numeric.csv")
 reduce_dat <- reduce_dat[c("Median.Home.Value","Total.Population","Diversity.Index1","Median.Household.Income",
@@ -74,7 +75,7 @@ Constant variance of erros assumptions can often be solve with response variable
 In conclusion, our best transformation is the " log" transformation. The residual plot does not appear to have any alarming shape, and the the residuals are normally distributed, except for the problematic observations, 9, 49 and 58. Our new transformed model indicate that a linear model provides a decent fit to the data.
 
 
-```{r, echo= TRUE}
+```{r, echo= FALSE}
 y_recs <- y^(-1/2)
 y_rec <- y^(-1)
 fit1 <- lm(sqrt(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
@@ -86,7 +87,7 @@ autoplot(fit2)[1:2]
 ```
 # Full regression model
 
-```{r}
+```{r, echo=FALSE}
 summary(lm(log(Median.Home.Value) ~., data = reduce_dat))
 ```
 
@@ -97,13 +98,13 @@ This is a first good step in our analysis and important to keep in mind.
 # Evaluating all possible subset regression models
 
 For Variable selection it is a good practice to exclude problematic observations?
-```{r}
+```{r, echo=FALSE}
 model <- lm(log(y)~x1+x2+x3+x4+x5+x6+x7)
-ols_step_all_possible(model)
+#ols_step_all_possible(model)
 plot(ols_step_all_possible(model))
 ```
 
-```{r}
+```{r, echo=FALSE}
 ols_step_best_subset(model)
 ```
 
@@ -132,7 +133,7 @@ Once we identified the "best"" candidate models, we compare its predicted residu
 
 # PRESS Statistic and Multicollinearity test:
 
-```{r}
+```{r, echo=FALSE}
 # PRESS STATISTIC
 fit_1 <- lm(log(y)~x4)
 fit_8 <- lm(log(y)~x3+x7)
@@ -143,10 +144,10 @@ fit_120 <- lm(log(y)~x1+x3+x4+x5+x6+x7)
 fit_127 <- lm(log(Median.Home.Value) ~., data = reduce_dat) #important that its done this way. otherwise Median.Home value become a regressor
 
 # PRESS STATISTIC
-PRESS(fit_1) 
+#PRESS(fit_1) 
 PRESS(fit_8) 
 PRESS(fit_29)
-PRESS(fit_64) # lowest PRESS
+PRESS(fit_64)
 PRESS(fit_99)
 PRESS(fit_120)
 PRESS(fit_127) 
@@ -167,9 +168,30 @@ y_hat = 1.210e+01 -1.258e-05x1 + 1.382e-05x3 + 3.717e-05x5 -6.015e-03x7
 
 y_hat = 1.267e+01 + 1.301e-05x3 -1.547e-01x6 -6.197e-03x7
 
-```{r}
+```{r, echo=FALSE}
 autoplot(fit_64)[1:2]
 autoplot(fit_29)[1:2]
 ```
 
 
+# Cross Validation:
+
+
+```{r, echo=FALSE}
+m0 <- lm(y~x1+x3+x5+x7, data = reduce_dat)
+m1 <- lm(y~x3+x6+x7, data = reduce_dat)
+
+folds <- cvFolds(nrow(reduce_dat), K = 4, R =12) #type = "random", "consecutive", "interleaved"
+cvfit_0 <- cvLm(m0, cost = rtmspe,folds = folds)
+cvfit_1 <- cvLm(m1, cost = rtmspe,folds = folds)
+
+cvFits <- cvSelect(LS0 = cvfit_0, LS1 = cvfit_1)
+cvFits
+
+densityplot(cvFits)
+```
+# Interpretation:
+
+After splitting the data into 4 groups and repeated the fold cross-validation by 12, the best model is LS0 which is y~x1+x3+x5+x7, therefore our completed model shoudl be:
+
+y_hat = 1.210e+01 -1.258e-05x1(Total.Population) + 1.382e-05x3(Median.Household.Income) + 3.717e-05x5(Total.Housing.Units) -6.015e-03x7(Housing.Affordability.Index2)
