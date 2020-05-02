@@ -381,3 +381,5 @@ It turns out that we have the same results of colleration. Median household inco
 
 # References
 
+Montgomery, Douglas C., and Anne G. Ryan. Introduction to Linear Regression Analysis, 
+     Fifth Edition. Wiley, 2013.
