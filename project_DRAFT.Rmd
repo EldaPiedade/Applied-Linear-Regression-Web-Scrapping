@@ -1,0 +1,109 @@
+---
+title: "Group1_Project"
+author: "Group_1"
+date: "April 29, 2020"
+output: pdf_document
+---
+# Introduction:
+The background of this data comes from ...
+
+
+# Read In Data:
+```{r, echo=FALSE}
+library(ggfortify)
+library(car)
+library(olsrr)
+library(MPV)
+
+reduce_dat <- read.csv("CSV/DATA/reduce_data.csv")
+
+y <- reduce_dat$Zip_c
+x1 <- reduce_dat$Total.Population
+x2 <- reduce_dat$Diversity.Index1
+x3 <- reduce_dat$Median.Household.Income
+x4 <- reduce_dat$Per.Capita.Income
+x5 <- reduce_dat$Total.Housing.Units
+x6 <- reduce_dat$Median.Home.Value
+x7 <- reduce_dat$Average.Household.Size
+
+fit <- lm(y~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
+```
+# Performing variable selection:
+```{r,echo=FALSE}
+ols_step_all_possible(fit)
+plot(ols_step_all_possible(fit))
+```
+# Interpretation of variable Selection:
+In looking for the "best" model, certain criteria must be met inorder for proper variable selection of the regressor equation.  These criteria help us to be able to explain the data in the simpliest way with redundant predictors removed inorder minimize cost and to avoid multi-collinearity in our regression model. 
+
+The criteria for our variable selection include:
+1) Large R^2 value
+2) Maximum Adjusted R^2 value
+3) Minimum MSres
+4) Minimum Mallow's Cp Statistic value
+
+Based on the above criteria, the "best" candidate models are:
+1) Model 29: y ~ x1 + x3 + x6
+2) Model 64: Y ~ x3 + x5 + x6 + x7
+3) Model 99: Y ~ x2 + x3 + x5 + x6 + x7
+4) Model 120: Y ~ x2 + x3 + x4 + x5 + x6 + x7 
+
+Once we identified the "best"" candidate models, we compare its predicted residual error sum of squares (PRESS) statistic with other candidate models and selected the model with the smallest value. We also compare candidate models by performing a variance inflation factor (VIF) in order to quantify the severity of multicollinearity in the model.
+```{r, echo = FALSE}
+fit29 <- lm(y~x1+x3+x6,data=reduce_dat)
+fit64 <- lm(y~x3+x5+x6+x7,data=reduce_dat)
+fit99 <- lm(y~x2+x3+x5+x6+x7,data=reduce_dat)
+fit120 <- lm(y~x2+x3+x4+x5+x6+x7,data=reduce_dat)
+
+PRESS(fit29) # lowest PRESS
+PRESS(fit64)
+PRESS(fit99)
+PRESS(fit120)
+
+vif(fit29)
+vif(fit64)
+vif(fit99) # all regressors under 5
+vif(fit120)
+
+```
+# Interpretation of PRESS and Vif of candidate models:
+The model with the lowest PRESS value in model 29, Y = x1 + x3 + x6 and the same model doesnt show any evidence of multicolinearity in the variance inflation factor test of each regressor.
+
+# Plot of model:
+```{r}
+autoplot(fit29,size = 0.5, colour = 'sienna2')[1:2]
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### other CSV links
+
+#TX_gz_num <- read.csv("CSV/DATA/texas_Gazetteer_numeric.csv")
+#products <- read.csv("CSV/OTHER/products.csv")
+#test_data <- read.csv("CSV/OTHER/test_data.csv")
+#TX_gz_obj <- read.csv("CSV/OTHER/texas_Gazetteer_object.csv")
+#train_dat <- read.csv("CSV/OTHER/train_data.csv")
+
