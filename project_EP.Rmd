@@ -99,7 +99,7 @@ This is a first good step in our analysis and important to keep in mind.
 For Variable selection it is a good practice to exclude problematic observations?
 ```{r}
 model <- lm(log(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
-#ols_step_all_possible(model)
+ols_step_all_possible(model)
 plot(ols_step_all_possible(model))
 ```
 
@@ -116,10 +116,10 @@ Based on the above criteria, the "best" candidate models are:
 
 1) Model 1:  y ~ x4
 2) Model 8:	 y ~ x3 + x7
-3) Model 24: y ~ x5 + x7
+3) Model 29: y ~ x3 + x6 + x7
 4) Model 64: y ~ x2 + x3 + x6 + x7
 5) Model 99: y ~ x1 + x3 + x5 + x6 + x7
-6) Model 122:y ~ x1 + x2 + x3 + x4 + x5 + x7
+6) Model 120:y ~ x1 + x3 + x4 + x5 + x6 + x7
 7) Model 127:y ~.
 
 
@@ -131,31 +131,28 @@ Once we identified the "best"" candidate models, we compare its predicted residu
 ```{r}
 fit1 <- lm(log(y)~x4,data=reduce_dat)
 fit8 <- lm(log(y)~x3+x7,data=reduce_dat)
-fit24 <- lm(log(y)~x5+x7,data=reduce_dat)
+fit29 <- lm(log(y)~x3+x6+x7,data=reduce_dat)
 fit64 <- lm(log(y)~x2+x3+x6+x7,data=reduce_dat)
 fit99 <- lm(log(y)~x1+x3+x5+x6+x7,data=reduce_dat)
-fit122 <- lm(log(y)~x1+x2+x3+x4+x5+x7,data=reduce_dat)
+fit120 <- lm(log(y)~x1+x3+x4+x5+x6+x7,data=reduce_dat)
 fit127 <- lm(log(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 
-PRESS(fit1) # lowest PRESS
+paste("Model 1")
+PRESS(fit1) 
 PRESS(fit8)
-PRESS(fit24)
+PRESS(fit29)
 PRESS(fit64)
 PRESS(fit99)
-PRESS(fit122)
+PRESS(fit120)
 PRESS(fit127)
 
 
 vif(fit8)
-vif(fit24)
+vif(fit29)
 vif(fit64)
 vif(fit99)
-vif(fit122)
+vif(fit120)
 vif(fit127)
-
-
-
-
 ```
 # Interpretation of PRESS and Vif of candidate models:
 The model with the lowest PRESS value is model 99 [ log(y) ~ x1 + x3 + x5 + x6 + x7] however there is evidence of multicolliniearity.
