@@ -2,11 +2,14 @@
 title: "Applied Regression Final Project"
 author: "Elda Piedade, Thomas Oswald"
 date: "May 4th, 2020"
+header-includes:
+- \usepackage{xcolor}
+- \usepackage{framed}
 output: 
   pdf_document: default
   html_document:
     df_print: paged
-  toc: true
+   
 ---
 
 ```{r setup, include=FALSE}
@@ -14,42 +17,77 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
+
 # Introduction
+
+
+\colorlet{shadecolor}{gray!10}
+
+
+\begin{shaded}
+
 
 The objective of this project is to find the best linear regression model to predict the median home value for the houses in the Houston neighborhoods. Data was gathered from 96 zip codes in Houston by utilizing python web scrapping resources to collect data from the Texas Hometown Locator website (owned by HTL, Inc.).With the dataset extracted and cleaned, exploratory data analysis and statistical analysis were performed to understand the relationship between the median home value and other variables, such as diversity index, per capita income, and average household size. Based on the analysis, data was modeled with linear regression. 
 
+
+\end{shaded}
+
 # Importance
+
+\colorlet{shadecolor}{gray!10}
+
+
+\begin{shaded}
 
 1. With a good model for prediction and analysis, individuals in Houston will be able to understand how to price their homes for sale.
 2. Understanding how the demographic factors relate to median home value is valuable social knowledge.
 
+\end{shaded}
 # Data 
+\colorlet{shadecolor}{gray!10}
+
+
+\begin{shaded}
 Response variable : Median Home Value
+
 Predictors:
 
 * $x_1$ -Total Population
 
 * $x_2$ - Diversity Index
 
-* Median Household Income
+* $x_3$ - Median Household Income
 
-* Per Capita Income
+* $x_4$ - Per Capita Income
 
-* Total Housing Units
+* $x_5$ - Total Housing Units
 
-* Average Household Size
+* $x_6$ - Average Household Size
 
-* Housing affordability Index
+* $x_7$ - Housing affordability Index
+
+\end{shaded}
+
+\pagebreak
 
 # Data Loading & Checking full Model Accuracy:
 
+\colorlet{shadecolor}{gray!10}
+
+
+\begin{shaded}
+
 After loeading the data and creating a full Linear Regression (LR) model, we found that the model is not adequate. The residuals have a tunel and bowl shape; the data is heavily-tailed distribution with three possible influencial points. To address this problem we will inspect the dat and perform a few transformations.
 
-```{r, echo= FALSE}
+\end{shaded}
+
+### First model - Residual Plots:
+```{r, echo= FALSE, out.height= "27%"}
 suppressMessages(library(ggfortify))
 suppressMessages(library(car))
 suppressMessages(library(olsrr))
 suppressMessages(library(MPV))
+suppressMessages(library(gridExtra))
 
 reduce_dat <- read.csv("CSV/DATA/texas_Gazetteer_numeric.csv")
 reduce_dat <- reduce_dat[c("Median.Home.Value","Total.Population","Diversity.Index1","Median.Household.Income",
@@ -65,19 +103,26 @@ x6 <- reduce_dat$Average.Household.Size
 x7 <- reduce_dat$Housing.Affordability.Index2
 
 fit <- lm(y~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
-summary(fit)
-autoplot(fit)[1:2]
+autoplot(fit, size = 0.5, colour = 'sienna2')[1:2]
 ```
 
+
 # Data Transformation
+
+\colorlet{shadecolor}{gray!10}
+
+
+\begin{shaded}
 
 Constant variance of erros assumptions can often be solve with response variable transformations. The log transformations performed the best compared to other transformations. It has the most appropriate properties for the normality of residuals and constant variance. The residual plot for the other transformation (reciprocal, square root, reciprocal square root and inverse) did not show much improvement from the original model and were very influenced by possible influencial points.
 
 In conclusion, our best transformation is the " log" transformation. The residual plot does not appear to have any alarming shape, and the the residuals are normally distributed, except for the problematic observations, 9, 49 and 58. Our new transformed model indicate that a linear model provides a decent fit to the data.
 
+\end{shaded}
+
 ### Log Transformmed model - Residual Plots:
 
-```{r, echo= FALSE}
+```{r, echo= FALSE,out.height= "27%"}
 y_recs <- y^(-1/2)
 y_rec <- y^(-1)
 fit1 <- lm(sqrt(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
@@ -85,31 +130,41 @@ fit2 <- lm(log(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 fit3 <- lm(y_recs ~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 fit4 <- lm(y_rec~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 
-autoplot(fit2)[1:2]
+autoplot(fit2,size = 0.5, colour = 'sienna2')[1:2]
 
 ```
+\pagebreak
 
-# Full regression model
+# Full Regression Model Significance Test
+
+\colorlet{shadecolor}{gray!10}
+
+
+\begin{shaded}
 
 Our linear regression model is significant given that the p-value for the F-test is smaller than our level of significance 0.05. Looking at the regressor individually, we found that the intercept, total population, median household income, total housing units and housing affordability index are signifacnt for predicting log(median home value). In model detail the F-test is perfomed to understand if at least one regressor is not equal to zero. The conclusion is supported by the t-test performed for each regressor.
 This is a first good step in our analysis and important to keep in mind.
 
-```{r}
+\end{shaded}
+
+```{r, echo= FALSE}
 summary(lm(log(Median.Home.Value) ~., data = reduce_dat))
 ```
 
-
-
 # Evaluating all possible subset regression models
 
+\colorlet{shadecolor}{gray!10}
+
+
+\begin{shaded}
 
 In looking for the "best" model, certain criteria must be met inorder for proper variable selection of the regressor equation.  These criteria help us to be able to explain the data in the simpliest way with redundant predictors removed inorder minimize cost and to avoid multi-collinearity in our regression model. 
 
 The criteria for our variable selection include:
-1) Large R^2 value
-2) Maximum Adjusted R^2 value
+1) Large $R^2$ value
+2) Maximum Adjusted $R^2$ value
 3) Minimum MSres
-4) Minimum Mallow's Cp Statistic value
+4) Minimum Mallow's $C_p$ Statistic value.
 
 
 Based on the above criteria, the "best" candidate models are:
@@ -125,8 +180,9 @@ Based on the above criteria, the "best" candidate models are:
 
 Once we identified the "best"" candidate models, we compare its predicted residual error sum of squares (PRESS) statistic with other candidate models and selected the model with the smallest value. We also compare candidate models by performing a variance inflation factor (VIF) in order to quantify the severity of multicollinearity in the model.
 
+\end{shaded}
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, out.height= "30%"}
 
 model <- lm(log(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 #ols_step_all_possible(model)
@@ -135,9 +191,17 @@ plot(ols_step_all_possible(model))
 
 # Evaluation of PRESS and VIF of candidate models:
 
-The model with the lowest PRESS value is model 64 [ log(y) ~ x2 + x3 + x6 + x7] however there is evidence of multicolliniearity.
+\colorlet{shadecolor}{gray!10}
 
-The model with the second lowest PRESS value is model 29 [ log(y) ~ x3 + x6 + x7] and the same model doesnt show any evidence of multicolinearity in the variance inflation factor test of each regressor.
+\begin{shaded}
+
+* The model with the lowest PRESS value is Model 64 however there is evidence of multicolliniearity.
+
+* The model with the second lowest PRESS value is Model 29  and the same model doesnt show any evidence of multicolinearity in the variance inflation factor test of each regressor.
+
+\end{shaded}
+
+### PRESS Statistic:
 
 ```{r, echo = FALSE}
 fit1 <- lm(log(y)~x4,data=reduce_dat)
@@ -159,6 +223,8 @@ paste("Model 127 PRESS:",round(PRESS(fit127),3))
 
 ```
 
+### Multicolinearity Check:
+
 ```{r, echo =FALSE}
 paste("Variance Inflation Factor")
 vif(fit8)
@@ -171,7 +237,11 @@ vif(fit127)
 
 # Residual Plots of best models:
 
-```{r}
-autoplot(fit29,size = 0.5, colour = 'sienna2')[1:2]
-autoplot(fit64,size = 0.5, colour = 'sienna2')[1:2]
+```{r out.height= "25%", echo= FALSE}
+p <- autoplot(fit29,size = 0.5, colour = 'sienna2')[1:2]
+q <- autoplot(fit64,size = 0.5, colour = 'sienna2')[1:2]
+
+grid.arrange(grobs = p@plots, ncol = 2, nrow = 1, labels = c("A", "B"),
+             top= "Residual Plots for Model 29")
+grid.arrange(grobs = q@plots, ncol = 2, nrow = 1, top= "Residual Plots for Model 64")
 ```
