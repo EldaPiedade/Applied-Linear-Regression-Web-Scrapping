@@ -2,10 +2,11 @@
 title: "Applied Regression Final Project"
 author: "Elda Piedade, Thomas Oswald"
 date: "May 4th, 2020"
-output:
+output: 
   pdf_document: default
   html_document:
     df_print: paged
+  toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -67,41 +68,40 @@ fit <- lm(y~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 summary(fit)
 autoplot(fit)[1:2]
 ```
+
 # Data Transformation
 
 Constant variance of erros assumptions can often be solve with response variable transformations. The log transformations performed the best compared to other transformations. It has the most appropriate properties for the normality of residuals and constant variance. The residual plot for the other transformation (reciprocal, square root, reciprocal square root and inverse) did not show much improvement from the original model and were very influenced by possible influencial points.
 
 In conclusion, our best transformation is the " log" transformation. The residual plot does not appear to have any alarming shape, and the the residuals are normally distributed, except for the problematic observations, 9, 49 and 58. Our new transformed model indicate that a linear model provides a decent fit to the data.
 
+### Log Transformmed model - Residual Plots:
 
-```{r, echo= TRUE}
+```{r, echo= FALSE}
 y_recs <- y^(-1/2)
 y_rec <- y^(-1)
 fit1 <- lm(sqrt(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 fit2 <- lm(log(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 fit3 <- lm(y_recs ~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 fit4 <- lm(y_rec~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
+
 autoplot(fit2)[1:2]
 
 ```
+
 # Full regression model
+
+Our linear regression model is significant given that the p-value for the F-test is smaller than our level of significance 0.05. Looking at the regressor individually, we found that the intercept, total population, median household income, total housing units and housing affordability index are signifacnt for predicting log(median home value). In model detail the F-test is perfomed to understand if at least one regressor is not equal to zero. The conclusion is supported by the t-test performed for each regressor.
+This is a first good step in our analysis and important to keep in mind.
 
 ```{r}
 summary(lm(log(Median.Home.Value) ~., data = reduce_dat))
 ```
 
-Our linear regression model is significant given that the p-value for the F-test is smaller than our level of significance 0.05. Looking at the regressor individually, we found that the intercept, total population, median household income, total housing units and housing affordability index are signifacnt for predicting log(median home value). In model detail the F-test is perfomed to understand if at least one regressor is not equal to zero. The conclusion is supported by the t-test performed for each regressor.
-This is a first good step in our analysis and important to keep in mind.
 
 
 # Evaluating all possible subset regression models
 
-For Variable selection it is a good practice to exclude problematic observations?
-```{r}
-model <- lm(log(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
-ols_step_all_possible(model)
-plot(ols_step_all_possible(model))
-```
 
 In looking for the "best" model, certain criteria must be met inorder for proper variable selection of the regressor equation.  These criteria help us to be able to explain the data in the simpliest way with redundant predictors removed inorder minimize cost and to avoid multi-collinearity in our regression model. 
 
@@ -123,12 +123,23 @@ Based on the above criteria, the "best" candidate models are:
 7) Model 127:y ~.
 
 
-
 Once we identified the "best"" candidate models, we compare its predicted residual error sum of squares (PRESS) statistic with other candidate models and selected the model with the smallest value. We also compare candidate models by performing a variance inflation factor (VIF) in order to quantify the severity of multicollinearity in the model.
 
 
+```{r, echo = FALSE}
 
-```{r}
+model <- lm(log(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
+#ols_step_all_possible(model)
+plot(ols_step_all_possible(model))
+```
+
+# Evaluation of PRESS and VIF of candidate models:
+
+The model with the lowest PRESS value is model 64 [ log(y) ~ x2 + x3 + x6 + x7] however there is evidence of multicolliniearity.
+
+The model with the second lowest PRESS value is model 29 [ log(y) ~ x3 + x6 + x7] and the same model doesnt show any evidence of multicolinearity in the variance inflation factor test of each regressor.
+
+```{r, echo = FALSE}
 fit1 <- lm(log(y)~x4,data=reduce_dat)
 fit8 <- lm(log(y)~x3+x7,data=reduce_dat)
 fit29 <- lm(log(y)~x3+x6+x7,data=reduce_dat)
@@ -137,15 +148,19 @@ fit99 <- lm(log(y)~x1+x3+x5+x6+x7,data=reduce_dat)
 fit120 <- lm(log(y)~x1+x3+x4+x5+x6+x7,data=reduce_dat)
 fit127 <- lm(log(y)~x1+x2+x3+x4+x5+x6+x7,data=reduce_dat)
 
-PRESS(fit1) 
-PRESS(fit8)
-PRESS(fit29)
-PRESS(fit64)
-PRESS(fit99)
-PRESS(fit120)
-PRESS(fit127)
 
+paste("Model 1 PRESS:",round(PRESS(fit1),3))
+paste("Model 8 PRESS:",round(PRESS(fit8),3))
+paste("Model 29 PRESS:",round(PRESS(fit29),3))
+paste("Model 64 PRESS:",round(PRESS(fit64),3))
+paste("Model 99 PRESS:",round(PRESS(fit99),3))
+paste("Model 120 PRESS:",round(PRESS(fit120),3))
+paste("Model 127 PRESS:",round(PRESS(fit127),3))
 
+```
+
+```{r, echo =FALSE}
+paste("Variance Inflation Factor")
 vif(fit8)
 vif(fit29)
 vif(fit64)
@@ -153,14 +168,9 @@ vif(fit99)
 vif(fit120)
 vif(fit127)
 ```
-# Interpretation of PRESS and Vif of candidate models:
 
-The model with the lowest PRESS value is model 64 [ log(y) ~ x2 + x3 + x6 + x7] however there is evidence of multicolliniearity.
+# Residual Plots of best models:
 
-The model with the second lowest PRESS value is model 29 [ log(y) ~ x3 + x6 + x7] and the same model doesnt show any evidence of multicolinearity in the variance inflation factor test of each regressor.
-
-
-# Plot of model:
 ```{r}
 autoplot(fit29,size = 0.5, colour = 'sienna2')[1:2]
 autoplot(fit64,size = 0.5, colour = 'sienna2')[1:2]
