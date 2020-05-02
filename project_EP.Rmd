@@ -170,11 +170,17 @@ The criteria for our variable selection include:
 Based on the above criteria, the "best" candidate models are:
 
 1) Model 1:  y ~ x4
+
 2) Model 8:	 y ~ x3 + x7
+
 3) Model 29: y ~ x3 + x6 + x7
+
 4) Model 64: y ~ x1 + x3 + x5 + x7
+
 5) Model 99: y ~ x1 + x3 + x5 + x6 + x7
+
 6) Model 120:y ~ x1 + x3 + x4 + x5 + x6 + x7
+
 7) Model 127:y ~.
 
 
