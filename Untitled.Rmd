@@ -1,0 +1,21 @@
+---
+header-includes:
+- \usepackage{xcolor}
+- \usepackage{framed}
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+\colorlet{shadecolor}{gray!10}
+
+
+\begin{shaded}
+
+Red text with a gray background.
+
+\end{shaded}
+
