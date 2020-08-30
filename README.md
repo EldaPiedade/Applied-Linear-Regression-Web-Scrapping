@@ -1,4 +1,6 @@
 # FINAL_PROJEC_STATS_4310
+
+To see the workbook for the Applied Linear Regression project go to : https://github.com/EldaPiedade/FINAL_PROJECT_STATS_4310/blob/master/AP_Project_Group1.pdf
 The Data On this  Repository was gathered at https://texas.hometownlocator.com/tx/houston/ for use at Scholars Academy TTC Program by Elda Piedade.
 
 # Abstract
@@ -24,3 +26,5 @@ median home value. Further, into this research, the population in focus
 will extend to other Texas cities, such as Austin. With more data, the
 relationship between variables and median home value can be better
 evaluated as well as the prediction capacity of each model.
+
+
