@@ -5,6 +5,8 @@ To see the workbook for the Applied Linear Regression project go to : https://gi
 
 The Data On this  Repository was gathered at https://texas.hometownlocator.com/tx/houston/ for use at Scholars Academy TTC Program by Elda Piedade.
 
+Web Scraping Notebook: https://github.com/EldaPiedade/FINAL_PROJECT_STATS_4310/blob/master/WEBSCRAPPING_Texas_Gazette.ipynb
+
 # Abstract
 
 The objective of this research is to implement linear regression and
